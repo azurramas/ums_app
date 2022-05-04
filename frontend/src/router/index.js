@@ -14,13 +14,21 @@ const routes = [
     path: "/create-user",
     name: "Create User",
     component: () =>
-      import(/* webpackChunkName: "createuser" */ "../views/CreateUser.vue"),
+      import(
+        /* webpackChunkName: "createuser" */ "../components/CreateUser.vue"
+      ),
   },
   {
     path: "/edit-user/:id",
     name: "Edit User",
     component: () =>
-      import(/* webpackChunkName: "edituser" */ "../components/EditUser.vue"),
+      import(/* webpackChunkName: "edituser" */ "../views/EditUser.vue"),
+  },
+  {
+    path: "/edit-perms/:id",
+    name: "Edit Permissions",
+    component: () =>
+      import(/* webpackChunkName: "editperms" */ "../views/EditPerms.vue"),
   },
 ];
 

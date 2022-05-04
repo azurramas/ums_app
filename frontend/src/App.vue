@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar flat app color="primary" dark>
+    <v-app-bar flat app color="primDark" dark>
       <v-toolbar-title>
         <strong>User Management System</strong>
       </v-toolbar-title>

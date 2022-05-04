@@ -19,7 +19,7 @@
           dark
           large
           elevation="0"
-          color="primDark"
+          color="primary"
         >
           <v-icon left>mdi-account-plus</v-icon> Add a User</v-btn
         ></v-col
@@ -36,7 +36,7 @@
 
 <script>
 import UserTable from "../components/UserTable.vue";
-import CreateUser from "./CreateUser.vue";
+import CreateUser from "../components/CreateUser.vue";
 export default {
   components: {
     UserTable,

@@ -4,29 +4,52 @@ import "github.com/azurramas/ums_app/services"
 
 type Permission struct {
 	Code        string `db:"code" json:"code"`
-	Description string `db:"desc" json:"desc"`
-	UserID      int64  `db:"userID" json:"userID"`
+	Description string `db:"description" json:"desc"`
 	ID          int64  `db:"id" json:"id"`
 }
 
+type UserPermissions struct {
+	UserID int `db:"userID" json:"userID"`
+	PermID int `db:"permID" json:"permID"`
+}
+
 var permsSchema = `CREATE TABLE permissions (
-	desc varchar(255) NOT NULL,
-	code int NOT NULL,
-	userID int NOT NULL,
+	description varchar(255) NOT NULL,
+	code varchar(50) NOT NULL,
 	id int NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (id)
 	);`
 
-func (p *Permission) Add() error {
+var userPermsSchema = `CREATE TABLE user_permissions (
+		userID int NOT NULL,
+		permID int NOT NULL
+		);`
+
+func ListPermissions() ([]Permission, error) {
+	var permissions []Permission
+
 	db := services.AppInstance.GetDBConn()
 
-	perm, err := db.NamedExec(`INSERT INTO permissions (code, desc, userID) 
-					VALUES (:code, :desc, :userID)`, p)
-	if err != nil {
-		return err
-	}
+	err := db.Select(&permissions, "SELECT * FROM permissions")
 
-	p.ID, err = perm.LastInsertId()
+	return permissions, err
+}
+
+func GetUserPermissions(userID int) ([]UserPermissions, error) {
+	var permissions []UserPermissions
+
+	db := services.AppInstance.GetDBConn()
+
+	err := db.Select(&permissions, "SELECT * FROM user_permissions WHERE userID = ?", userID)
+
+	return permissions, err
+}
+
+func AddPermToUser(permID int, userID int) error {
+	db := services.AppInstance.GetDBConn()
+
+	_, err := db.Exec(`INSERT INTO user_permissions (permID, userID) 
+					VALUES (?,?)`, permID, userID)
 	if err != nil {
 		return err
 	}
@@ -34,20 +57,10 @@ func (p *Permission) Add() error {
 	return err
 }
 
-func DeletePermissionByID(id int) error {
+func DeletePermissionByID(permID int, userID int) error {
 	db := services.AppInstance.GetDBConn()
 
-	_, err := db.NamedExec("DELETE FROM permissions WHERE id = ?", id)
+	_, err := db.Exec("DELETE FROM user_permissions WHERE permID = ? AND userID = ?", permID, userID)
 
 	return err
-}
-
-func PermissionExists(id int) (bool, error) {
-	var count int
-
-	db := services.AppInstance.GetDBConn()
-
-	err := db.Get(&count, "SELECT COUNT(*) FROM permissions WHERE id = ?", id)
-
-	return count > 0, err
 }

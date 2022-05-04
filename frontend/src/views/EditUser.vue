@@ -1,6 +1,7 @@
+a
 <template>
   <v-card flat rounded="lg">
-    <v-card-title class="primDark--text"> Create a New User </v-card-title>
+    <v-card-title class="primDark--text"> Edit User </v-card-title>
     <v-card-text>
       <v-form ref="userForm" class="mt-6">
         <v-row>
@@ -15,8 +16,8 @@
           </v-col>
           <v-col cols="12" sm="6" lg="4">
             <v-text-field
+              disabled
               class="rounded-lg"
-              :rules="rules"
               outlined
               v-model="user.password"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
@@ -25,16 +26,6 @@
               @click:append="showPassword = !showPassword"
             >
             </v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6" lg="4">
-            <v-select
-              class="rounded-lg"
-              :rules="rules"
-              outlined
-              v-model="user.status"
-              label="Status"
-              :items="statuses"
-            ></v-select>
           </v-col>
           <v-col cols="12" sm="6" lg="4">
             <v-text-field
@@ -63,6 +54,16 @@
               label="Email"
             ></v-text-field>
           </v-col>
+          <v-col cols="12" sm="6" lg="4">
+            <v-select
+              class="rounded-lg"
+              :rules="rules"
+              outlined
+              v-model="user.status"
+              label="Status"
+              :items="statuses"
+            ></v-select>
+          </v-col>
         </v-row>
       </v-form>
     </v-card-text>
@@ -70,25 +71,21 @@
       <v-spacer> </v-spacer>
       <v-btn
         text
-        @click="
-          $emit('closeDialog');
-          user = {};
-          $refs.userForm.resetValidation();
-        "
+        @click="$router.push('/')"
         class="rounded-lg mr-2 primDark--text"
         elevation="0"
       >
-        Cancel</v-btn
+        Go to Home Page</v-btn
       >
       <v-btn
         text
-        @click="submitUser()"
+        @click="saveChanges()"
         class="rounded-lg"
         dark
         elevation="0"
         color="primary"
       >
-        <v-icon left>mdi-check</v-icon> Submit</v-btn
+        <v-icon left>mdi-check</v-icon> Save Changes</v-btn
       >
     </v-card-actions>
   </v-card>
@@ -101,23 +98,20 @@ export default {
       showPassword: false,
       rules: [(v) => !!v || "This value is required"],
       statuses: ["Not active", "Active", "Pending", "Suspended"],
-      user: {
-        firstName: "",
-        lastName: "",
-        password: "",
-        status: "",
-        email: "",
-        username: "",
-      },
     };
   },
+  created() {
+    this.$store.dispatch("getUser", this.$route.params.id);
+  },
+  computed: {
+    user() {
+      return this.$store.getters.getUser;
+    },
+  },
   methods: {
-    submitUser() {
+    saveChanges() {
       if (this.$refs.userForm.validate()) {
-        this.$store.dispatch("addUser", this.user).then(() => {
-          this.$emit("closeDialog");
-          this.$dispatch("getUsers");
-        });
+        this.$store.dispatch("editUser", this.user);
       }
     },
   },

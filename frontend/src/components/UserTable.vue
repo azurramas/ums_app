@@ -20,7 +20,11 @@
           <v-icon color="warning" class="mr-2" @click="toggleEditUser(item.id)">
             mdi-pencil
           </v-icon>
-          <v-icon color="primary" class="mr-2" @click="editItem(item)">
+          <v-icon
+            color="primary"
+            class="mr-2"
+            @click="toggleEditPerms(item.id)"
+          >
             mdi-lock
           </v-icon>
 
@@ -63,7 +67,7 @@ export default {
   },
   computed: {
     users() {
-      return this.$store.getters.getUsers;
+      return this.$store.getters.getUsers || [];
     },
   },
   data() {
@@ -103,6 +107,9 @@ export default {
     },
     toggleEditUser(id) {
       this.$router.push({ name: "Edit User", params: { id: id } });
+    },
+    toggleEditPerms(id) {
+      this.$router.push({ name: "Edit Permissions", params: { id: id } });
     },
   },
 };

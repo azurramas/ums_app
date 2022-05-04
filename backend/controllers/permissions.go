@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -13,25 +12,22 @@ import (
 
 type Permissions struct{}
 
-func (p Permissions) Add(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
-	var permission models.Permission
-
-	err := json.NewDecoder(r.Body).Decode(&permission)
+func (p Permissions) List(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var permissions []models.Permission
+	permissions, err := models.ListPermissions()
 	if err != nil {
-		errorMsg := errors.New("error while decoding request body")
-		services.WriteError(w, errorMsg)
+		services.WriteError(w, err)
 		return
 	}
 
-	//Data validation
-	if permission.Description == "" || permission.Code == "" {
-		errorMsg := errors.New("mandatory data missing")
-		services.WriteError(w, errorMsg)
-		return
-	}
+	services.WriteResponse(w, permissions, http.StatusOK)
+}
 
-	userExists, err := models.UserExistsByID(permission.UserID)
+func (p Permissions) GetUserPerms(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID, _ := strconv.Atoi(ps.ByName("user_id"))
+	var permissions []models.UserPermissions
+
+	userExists, err := models.UserExistsByID(int64(userID))
 	if err != nil {
 		services.WriteError(w, err)
 		return
@@ -43,26 +39,57 @@ func (p Permissions) Add(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	err = permission.Add()
+	permissions, err = models.GetUserPermissions(userID)
 	if err != nil {
 		services.WriteError(w, err)
 		return
 	}
 
-	services.WriteResponse(w, permission, http.StatusOK)
+	services.WriteResponse(w, permissions, http.StatusOK)
 }
 
-func (p Permissions) Remove(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	id, _ := strconv.Atoi(ps.ByName("id"))
+func (p Permissions) Add(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID, _ := strconv.Atoi(ps.ByName("user_id"))
+	permID, _ := strconv.Atoi(ps.ByName("perm_id"))
 
-	permExists, _ := models.PermissionExists(id)
-	if !permExists {
-		errorMsg := errors.New("record does not exist")
+	userExists, err := models.UserExistsByID(int64(userID))
+	if err != nil {
+		services.WriteError(w, err)
+		return
+	}
+
+	if !userExists {
+		errorMsg := errors.New("user does not exist")
 		services.WriteError(w, errorMsg)
 		return
 	}
 
-	err := models.DeletePermissionByID(id)
+	err = models.AddPermToUser(permID, userID)
+	if err != nil {
+		services.WriteError(w, err)
+		return
+	}
+
+	services.WriteResponse(w, "Successfuly added permission.", http.StatusOK)
+}
+
+func (p Permissions) Remove(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID, _ := strconv.Atoi(ps.ByName("user_id"))
+	permID, _ := strconv.Atoi(ps.ByName("perm_id"))
+
+	userExists, err := models.UserExistsByID(int64(userID))
+	if err != nil {
+		services.WriteError(w, err)
+		return
+	}
+
+	if !userExists {
+		errorMsg := errors.New("user does not exist")
+		services.WriteError(w, errorMsg)
+		return
+	}
+
+	err = models.DeletePermissionByID(permID, userID)
 	if err != nil {
 		services.WriteError(w, err)
 		return

@@ -30,8 +30,10 @@ func main() {
 	router.DELETE("/user/:id", users.Delete)
 
 	// Permission Endpoints
-	router.POST("/perms", permissions.Add)
-	router.DELETE("/perms/:id", permissions.Remove)
+	router.GET("/perms", permissions.List)
+	router.GET("/perms/:user_id", permissions.GetUserPerms)
+	router.POST("/perms/:user_id/:perm_id", permissions.Add)
+	router.DELETE("/perms/:user_id/:perm_id", permissions.Remove)
 
 	n := negroni.Classic()
 	n.Use(negroni.HandlerFunc(services.CORS))
