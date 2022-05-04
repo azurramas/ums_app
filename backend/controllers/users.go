@@ -33,6 +33,8 @@ func (u Users) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		return
 	}
 
+	user.Password = ""
+
 	services.WriteResponse(w, user, http.StatusOK)
 }
 
@@ -109,14 +111,14 @@ func (u Users) Edit(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 
 	//Data validation
 	if user.Username == "" || user.FirstName == "" || user.LastName == "" ||
-		user.Email == "" || user.Password == "" || user.Status == "" {
+		user.Email == "" || user.Status == "" {
 		errorMsg := errors.New("mandatory data missing")
 		services.WriteError(w, errorMsg)
 		return
 	}
 
 	//Check if user exists with same username or email
-	userExists, err = user.ExistsByUsernameOrEmail()
+	userExists, err = user.ExistsByUsernameOrEmailWhereID()
 	if err != nil {
 		services.WriteError(w, err)
 		return
@@ -127,15 +129,6 @@ func (u Users) Edit(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 		services.WriteError(w, errorMsg)
 		return
 	}
-
-	//Add password hashing
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	if err != nil {
-		services.WriteError(w, err)
-		return
-	}
-
-	user.Password = string(bytes)
 
 	err = user.Update()
 	if err != nil {

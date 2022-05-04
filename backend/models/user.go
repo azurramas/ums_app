@@ -66,7 +66,7 @@ func (u *User) Update() error {
 	db := services.AppInstance.GetDBConn()
 
 	_, err := db.NamedExec(`UPDATE users SET firstName=:firstName, lastName=:lastName, username=:username, 
-							password=:password, email=:email, status=:status WHERE id=:id`, u)
+							email=:email, status=:status WHERE id=:id`, u)
 	if err != nil {
 		return err
 	}
@@ -94,6 +94,22 @@ func (u User) ExistsByUsernameOrEmail() (bool, error) {
 	}
 
 	err = db.Get(&count, "SELECT COUNT(*)  FROM users WHERE email = ?", u.Email)
+	return count > 0, err
+
+}
+
+func (u User) ExistsByUsernameOrEmailWhereID() (bool, error) {
+	var count int
+
+	db := services.AppInstance.GetDBConn()
+
+	err := db.Get(&count, "SELECT COUNT(*) FROM users WHERE username = ? AND id != ?", u.Username, u.ID)
+
+	if count > 0 {
+		return count > 0, err
+	}
+
+	err = db.Get(&count, "SELECT COUNT(*)  FROM users WHERE email = ? AND id != ?", u.Email, u.ID)
 	return count > 0, err
 
 }

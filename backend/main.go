@@ -34,6 +34,7 @@ func main() {
 	router.DELETE("/perms/:id", permissions.Remove)
 
 	n := negroni.Classic()
+	n.Use(negroni.HandlerFunc(services.CORS))
 	n.UseHandler(router)
 
 	url := ":" + app.Port

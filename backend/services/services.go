@@ -8,6 +8,15 @@ import (
 	"net/http"
 )
 
+func CORS(res http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+	res.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, PATCH, DELETE")
+	res.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+
+	next(res, req)
+}
+
 func WriteResponse(w http.ResponseWriter, data interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
