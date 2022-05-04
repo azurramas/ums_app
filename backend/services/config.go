@@ -21,6 +21,8 @@ type DBConfig struct {
 	Password string
 }
 
+var AppInstance App
+
 func Init() *App {
 
 	var a = App{
@@ -40,6 +42,7 @@ func Init() *App {
 	}
 
 	a.DB = db
+	AppInstance = a
 
 	return &a
 }

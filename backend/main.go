@@ -21,8 +21,9 @@ func main() {
 
 	// User Endpoints
 	router.GET("/users", users.List)
+	router.GET("/user/:id", users.Get)
 	router.POST("/user", users.Create)
-	router.PUT("/user/:id", users.Edit)
+	router.PUT("/user", users.Edit)
 	router.DELETE("/user/:id", users.Delete)
 
 	n := negroni.Classic()
