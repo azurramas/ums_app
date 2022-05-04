@@ -76,9 +76,24 @@ func (u *User) Update() error {
 
 func (u User) Delete() error {
 	db := services.AppInstance.GetDBConn()
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
 
-	_, err := db.Exec("DELETE FROM users WHERE id = ?", u.ID)
+	_, err = tx.Exec("DELETE FROM users WHERE id = ?", u.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
+	_, err = tx.Exec("DELETE FROM user_permissions WHERE userID = ?", u.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 	return err
 }
 
