@@ -95,7 +95,7 @@ func (u Users) Edit(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 		return
 	}
 
-	userExists, err := user.ExistsByID()
+	userExists, err := models.UserExistsByID(user.ID)
 	if err != nil {
 		services.WriteError(w, err)
 		return

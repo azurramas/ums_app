@@ -98,11 +98,11 @@ func (u User) ExistsByUsernameOrEmail() (bool, error) {
 
 }
 
-func (u User) ExistsByID() (bool, error) {
+func UserExistsByID(id int64) (bool, error) {
 	var count int
 
 	db := services.AppInstance.GetDBConn()
 
-	err := db.Get(&count, "SELECT COUNT(*) FROM users WHERE id = ?", u.ID)
+	err := db.Get(&count, "SELECT COUNT(*) FROM users WHERE id = ?", id)
 	return count > 0, err
 }

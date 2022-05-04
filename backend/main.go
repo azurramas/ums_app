@@ -11,7 +11,10 @@ import (
 
 func main() {
 
-	var users controllers.Users
+	var (
+		users       controllers.Users
+		permissions controllers.Permissions
+	)
 
 	app := services.Init()
 
@@ -25,6 +28,10 @@ func main() {
 	router.POST("/user", users.Create)
 	router.PUT("/user", users.Edit)
 	router.DELETE("/user/:id", users.Delete)
+
+	// Permission Endpoints
+	router.POST("/perms", permissions.Add)
+	router.DELETE("/perms/:id", permissions.Remove)
 
 	n := negroni.Classic()
 	n.UseHandler(router)
