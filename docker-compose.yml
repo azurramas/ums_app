@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+  backend:
+    build: ./backend
+    ports:
+      - "3010:3010"
+  database:
+    build: ./db
+    platform: linux/amd64
+    ports:
+      - "3306:3306"

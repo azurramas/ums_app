@@ -28,7 +28,7 @@ func Init() *App {
 	var a = App{
 		Port: "3010",
 		DBConf: &DBConfig{
-			Host:     "localhost",
+			Host:     "host.docker.internal",
 			Port:     "3306",
 			Name:     "ums_app",
 			Username: "root",
